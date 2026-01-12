@@ -499,7 +499,7 @@
 
             if (selectedArea > totalArea && totalArea > 0) {
                 playAudio(errorSound);
-                alert('تجاوزت المساحة الكلية المتاحة! يرجى تغيير اختياراتك.');
+                alert('تجاوزت المساحة الكلية المتاحة! حاول تغيير اختياراتك.');
                 checkboxes[checkboxes.length - 1].checked = false;
                 updateArea();
             }
@@ -514,7 +514,7 @@
 
             if (!name || !address || !contact || !totalAreaInput) {
                 playAudio(errorSound);
-                alert('يرجى ملء جميع الحقول بشكل صحيح!');
+                alert('عندك حاجة ما عملتها!');
                 return;
             }
 
@@ -537,7 +537,7 @@
 
             if (selectedItems.length === 0) {
                 playAudio(errorSound);
-                alert('يرجى اختيار لعبة واحدة على الأقل!');
+                alert(' اختيار ليك لعبة واحدة على الأقل!');
                 return;
             }
 
@@ -645,4 +645,5 @@
         });
     </script>
 </body>
+
 </html>
