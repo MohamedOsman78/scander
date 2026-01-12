@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>متجر الألعاب</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            background: url('https://wallpapercave.com/wp/wp1828855.jpg') no-repeat center center fixed;
+            background-size: cover;
+            color: #fff;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 0;
+        }
+
+        .content {
+            position: relative;
+            z-index: 1;
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 15px;
+            background: rgba(20, 20, 20, 0.85);
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.6);
+        }
+
+        h1 {
+            font-size: 1.8em;
+            color: #00d4ff;
+            text-align: center;
+            margin: 15px 0;
+        }
+
+        .search-filter {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            gap: 10px;
+        }
+
+        #search-bar, #category-filter {
+            flex: 1;
+            min-width: 150px;
+            padding: 8px;
+            border: none;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            font-size: 1em;
+        }
+
+        #search-bar:focus, #category-filter:focus {
+            outline: none;
+            box-shadow: 0 0 8px #00d4ff;
+        }
+
+        #user-input {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        #user-input label {
+            display: flex;
+            flex-direction: column;
+            font-size: 1em;
+            color: #ddd;
+        }
+
+        #user-input input {
+            margin-top: 5px;
+            padding: 8px;
+            border: none;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            font-size: 1em;
+        }
+
+        #user-input input:focus {
+            outline: none;
+            box-shadow: 0 0 8px #00d4ff;
+        }
+
+        #media-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .media-item {
+            position: relative;
+            padding: 10px;
+            background: rgba(40, 40, 40, 0.8);
+            border-radius: 10px;
+            transition: transform 0.3s ease;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .media-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 212, 255, 0.4);
+        }
+
+        .media-item img {
+            width: 80%;
+            height: auto;
+            object-fit: cover;
+            border-radius: 8px;
+            margin: 0 auto;
+            display: block;
+        }
+
+        .media-item p {
+            margin: 5px 0;
+            font-size: 0.85em;
+            color: #ccc;
+            cursor: pointer;
+        }
+
+        input[type="checkbox"] {
+            display: none;
+        }
+
+        .media-item::after {
+            content: '✓';
+            position: absolute;
+            bottom: 5px;
+            right: 10px;
+            font-size: 1.2em;
+            color: #00d4ff;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        input[type="checkbox"]:checked + .media-item::after {
+            opacity: 1;
+        }
+
+        .details-popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(20, 20, 20, 0.95);
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            width: 90%;
+            max-width: 350px;
+            text-align: center;
+        }
+
+        .details-popup img, .details-popup video {
+            width: 100%;
+            border-radius: 8px;
+        }
+
+        .details-popup p {
+            margin: 10px 0;
+            color: #ddd;
+            font-size: 0.9em;
+        }
+
+        .details-popup button {
+            padding: 8px 20px;
+            background: #00d4ff;
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            cursor: pointer;
+            font-size: 1em;
+        }
+
+        #confirm-btn {
+            display: block;
+            margin: 20px auto;
+            padding: 10px 25px;
+            background: linear-gradient(45deg, #00d4ff, #007bff);
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        #confirm-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0, 212, 255, 0.5);
+        }
+
+        .area-display {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(20, 20, 20, 0.9);
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+            z-index: 10;
+        }
+
+        .area-display p {
+            margin: 5px 0;
+            font-size: 0.9em;
+            color: #ddd;
+        }
+
+        .area-display span {
+            color: #00d4ff;
+            font-weight: bold;
+        }
+
+        #start-audio-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            padding: 10px 20px;
+            background: linear-gradient(45deg, #00d4ff, #007bff);
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            font-family: 'Cairo', sans-serif;
+            font-size: 1em;
+            cursor: pointer;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        #start-audio-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0, 212, 255, 0.5);
+        }
+
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 1.5em;
+            }
+
+            .search-filter {
+                flex-direction: column;
+            }
+
+            #search-bar, #category-filter {
+                width: 100%;
+            }
+
+            #user-input {
+                grid-template-columns: 1fr;
+            }
+
+            #media-container {
+                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            }
+
+            .media-item p {
+                font-size: 0.75em;
+            }
+
+            #confirm-btn {
+                padding: 8px 20px;
+                font-size: 0.9em;
+            }
+
+            .area-display {
+                bottom: 10px;
+                right: 10px;
+                padding: 8px;
+            }
+
+            .area-display p {
+                font-size: 0.8em;
+            }
+
+            #start-audio-btn {
+                top: 10px;
+                left: 10px;
+                padding: 8px 15px;
+                font-size: 0.9em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="overlay"></div>
+    <button id="start-audio-btn">تشغيل الصوت</button>
+    <div class="content">
+        <h1>متجر الألعاب</h1>
+
+        <div class="search-filter">
+            <input type="text" id="search-bar" placeholder="ابحث عن لعبة...">
+            <select id="category-filter">
+                <option value="all">جميع الأنواع</option>
+                <option value="action">أكشن</option>
+                <option value="adventure">مغامرات</option>
+                <option value="sports">رياضة</option>
+            </select>
+        </div>
+
+        <section id="user-input">
+            <label>الاسم: <input type="text" id="name" required></label>
+            <label>العنوان: <input type="text" id="address" required></label>
+            <label>رقم الاتصال: <input type="text" id="contact" required></label>
+            <label>المساحة الكلية (GB): <input type="number" id="total-area" min="1" required></label>
+        </section>
+
+        <section id="selection">
+            <div id="media-container">
+                <label data-category="action">
+                    <input type="checkbox" value="IMG-001" data-area="50" onchange="updateArea()">
+                    <div class="media-item">
+                        <img src="https://i.pinimg.com/736x/f6/f7/86/f6f786a3409c409eb00c6f6f7acac5d8.jpg" alt="Image 1">
+                        <p onclick="showDetails('IMG-001')">الكود: IMG-001 | 50 GB</p>
+                    </div>
+                </label>
+                <label data-category="action">
+                    <input type="checkbox" value="IMG-002" data-area="20" onchange="updateArea()">
+                    <div class="media-item">
+                        <img src="https://upload.wikimedia.org/wikipedia/en/8/8b/God_of_War_III_cover_art.jpg" alt="Image 2">
+                        <p onclick="showDetails('IMG-002')">الكود: IMG-002 | 20 GB</p>
+                    </div>
+                </label>
+                <label data-category="sports">
+                    <input type="checkbox" value="IMG-003" data-area="29" onchange="updateArea()">
+                    <div class="media-item">
+                        <img src="https://static.labeb.com/images/catalogs/wm/56880/20138_700-w450.jpg" alt="Image 3">
+                        <p onclick="showDetails('IMG-003')">الكود: IMG-003 | 29 GB</p>
+                    </div>
+                </label>
+                <label data-category="action">
+                    <input type="checkbox" value="IMG-004" data-area="68" onchange="updateArea()">
+                    <div class="media-item">
+                        <img src="https://images-eu.ssl-images-amazon.com/images/I/91-3gl8WLbL._AC_UL330_SR330,330_.jpg" alt="Image 4">
+                        <p onclick="showDetails('IMG-004')">الكود: IMG-004 | 68 GB</p>
+                    </div>
+                </label>
+                <label data-category="action">
+                    <input type="checkbox" value="IMG-005" data-area="30" onchange="updateArea()">
+                    <div class="media-item">
+                        <img src="https://i5.walmartimages.com/seo/Grand-Theft-Auto-V-Rockstar-Games-PlayStation-3-710425471254_0fba9024-bbb2-44a1-9cef-a7ba41b81544_1.44e3b81d879b9dacf5983a97a42ea3b4.jpeg" alt="Image 5">
+                        <p onclick="showDetails('IMG-005')">الكود: IMG-005 | 30 GB</p>
+                    </div>
+                </label>
+                <label data-category="sports">
+                    <input type="checkbox" value="IMG-006" data-area="20" onchange="updateArea()">
+                    <div class="media-item">
+                        <img src="image/006.jpg" alt="Image 6">
+                        <p onclick="showDetails('IMG-006')">الكود: IMG-006 | 20 GB</p>
+                    </div>
+                </label>
+                <label data-category="adventure">
+                    <input type="checkbox" value="IMG-007" data-area="15" onchange="updateArea()">
+                    <div class="media-item">
+                        <img src="image/007.jpg" alt="Image 7">
+                        <p onclick="showDetails('IMG-007')">الكود: IMG-007 | 15 GB</p>
+                    </div>
+                </label>
+                <label data-category="adventure">
+                    <input type="checkbox" value="IMG-008" data-area="8" onchange="updateArea()">
+                    <div class="media-item">
+                        <img src="https://upload.wikimedia.org/wikipedia/en/8/8b/The_Last_of_Us_Part_II_cover_art.jpg" alt="Image 8">
+                        <p onclick="showDetails('IMG-008')">الكود: IMG-008 | 8 GB</p>
+                    </div>
+                </label>
+                <label data-category="action">
+                    <input type="checkbox" value="IMG-009" data-area="5" onchange="updateArea()">
+                    <div class="media-item">
+                        <img src="https://upload.wikimedia.org/wikipedia/en/6/68/Bloodborne_Cover_Wallpaper.jpg" alt="Image 9">
+                        <p onclick="showDetails('IMG-009')">الكود: IMG-009 | 5 GB</p>
+                    </div>
+                </label>
+                <label data-category="adventure">
+                    <input type="checkbox" value="IMG-010" data-area="1.7" onchange="updateArea()">
+                    <div class="media-item">
+                        <img src="https://upload.wikimedia.org/wikipedia/en/8/8e/Spider-Man_PS4_cover.jpg" alt="Image 10">
+                        <p onclick="showDetails('IMG-010')">الكود: IMG-010 | 1.7 GB</p>
+                    </div>
+                </label>
+            </div>
+            <button id="confirm-btn" onclick="exportToExcel()">تأكيد وتصدير</button>
+        </section>
+    </div>
+
+    <div id="details-popup" class="details-popup">
+        <div id="popup-content"></div>
+        <p id="popup-description"></p>
+        <button onclick="closeDetails()">إغلاق</button>
+    </div>
+
+    <div class="area-display">
+        <p>المساحة المختارة: <span id="selected-area">0</span> GB</p>
+        <p>المساحة المتبقية: <span id="remaining-area">0</span> GB</p>
+    </div>
+
+    <!-- الأصوات (محلية) -->
+    <audio id="background-audio-1">
+        <source src="sounds/background1.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="background-audio-2">
+        <source src="sounds/background2.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="background-audio-3">
+        <source src="sounds/background3.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="click-sound">
+        <source src="sounds/click.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="hover-sound">
+        <source src="sounds/hover.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="confirm-sound">
+        <source src="sounds/confirm.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="error-sound">
+        <source src="sounds/error.mp3" type="audio/mpeg">
+    </audio>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script>
+        let totalArea = 0;
+        let audioInitialized = false;
+        let currentVideo = null; // متغير لتتبع الفيديو الحالي
+
+        const backgroundAudios = [
+            document.getElementById('background-audio-1'),
+            document.getElementById('background-audio-2'),
+            document.getElementById('background-audio-3')
+        ];
+        const clickSound = document.getElementById('click-sound');
+        const hoverSound = document.getElementById('hover-sound');
+        const confirmSound = document.getElementById('confirm-sound');
+        const errorSound = document.getElementById('error-sound');
+
+        let currentBackgroundIndex = 0;
+
+        function playAudio(audio) {
+            if (!audioInitialized) return;
+            audio.currentTime = 0;
+            audio.play().catch(error => console.log('خطأ في تشغيل الصوت:', error));
+        }
+
+        function playNextBackground() {
+            if (!audioInitialized) return;
+            backgroundAudios.forEach(audio => audio.pause());
+            const currentAudio = backgroundAudios[currentBackgroundIndex];
+            currentAudio.volume = 0.2;
+            currentAudio.play().then(() => {
+                currentAudio.onended = function() {
+                    currentBackgroundIndex = (currentBackgroundIndex + 1) % backgroundAudios.length;
+                    playNextBackground();
+                };
+            }).catch(error => console.log('خطأ في تشغيل صوت الخلفية:', error));
+        }
+
+        document.getElementById('start-audio-btn').addEventListener('click', () => {
+            audioInitialized = true;
+            document.getElementById('start-audio-btn').style.display = 'none';
+            playNextBackground();
+        });
+
+        function updateArea() {
+            playAudio(clickSound);
+            const totalAreaInput = document.getElementById('total-area').value;
+            totalArea = parseFloat(totalAreaInput) || 0;
+
+            const checkboxes = document.querySelectorAll('input[type="checkbox"]:checked');
+            let selectedArea = 0;
+
+            checkboxes.forEach(checkbox => {
+                selectedArea += parseFloat(checkbox.getAttribute('data-area'));
+            });
+
+            const remainingArea = totalArea - selectedArea;
+
+            document.getElementById('selected-area').textContent = selectedArea.toFixed(1);
+            document.getElementById('remaining-area').textContent = remainingArea >= 0 ? remainingArea.toFixed(1) : '0';
+
+            if (selectedArea > totalArea && totalArea > 0) {
+                playAudio(errorSound);
+                alert('تجاوزت المساحة الكلية المتاحة! يرجى تغيير اختياراتك.');
+                checkboxes[checkboxes.length - 1].checked = false;
+                updateArea();
+            }
+        }
+
+        function exportToExcel() {
+            playAudio(confirmSound);
+            const name = document.getElementById('name').value.trim();
+            const address = document.getElementById('address').value.trim();
+            const contact = document.getElementById('contact').value.trim();
+            const totalAreaInput = document.getElementById('total-area').value;
+
+            if (!name || !address || !contact || !totalAreaInput) {
+                playAudio(errorSound);
+                alert('يرجى ملء جميع الحقول بشكل صحيح!');
+                return;
+            }
+
+            const totalAreaNum = parseFloat(totalAreaInput);
+            if (isNaN(totalAreaNum) || totalAreaNum <= 0) {
+                playAudio(errorSound);
+                alert('يرجى إدخال مساحة كلية صحيحة (رقم موجب)!');
+                return;
+            }
+
+            const selectedItems = [];
+            const checkboxes = document.querySelectorAll('input[type="checkbox"]:checked');
+
+            checkboxes.forEach(checkbox => {
+                selectedItems.push({
+                    code: checkbox.value,
+                    area: checkbox.getAttribute('data-area')
+                });
+            });
+
+            if (selectedItems.length === 0) {
+                playAudio(errorSound);
+                alert('يرجى اختيار لعبة واحدة على الأقل!');
+                return;
+            }
+
+            const data = [
+                ['الاسم', 'العنوان', 'رقم الاتصال', 'المساحة الكلية', 'الألعاب المختارة'],
+                [
+                    name,
+                    address,
+                    contact,
+                    totalAreaNum,
+                    selectedItems.map(item => `${item.code} (${item.area} GB)`).join(', ')
+                ]
+            ];
+
+            const ws = XLSX.utils.aoa_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'بيانات المستخدم');
+            XLSX.writeFile(wb, 'بيانات_المستخدم.xlsx');
+        }
+
+        function showDetails(code) {
+            playAudio(clickSound);
+            const popup = document.getElementById('details-popup');
+            const popupContent = document.getElementById('popup-content');
+            const popupDesc = document.getElementById('popup-description');
+
+            const gameDetails = {
+                'IMG-001': { video: 'video/001.mp4', desc: 'هنا يوجد وصف الصورة 1' },
+                'IMG-002': { img: 'https://upload.wikimedia.org/wikipedia/en/8/8b/God_of_War_III_cover_art.jpg', desc: 'هنا يوجد وصف الصورة 2' },
+                'IMG-003': { img: 'https://static.labeb.com/images/catalogs/wm/56880/20138_700-w450.jpg', desc: 'هنا يوجد وصف الصورة 3' },
+                'IMG-004': { img: 'https://images-eu.ssl-images-amazon.com/images/I/91-3gl8WLbL._AC_UL330_SR330,330_.jpg', desc: 'هنا يوجد وصف الصورة 4' },
+                'IMG-005': { img: 'https://i5.walmartimages.com/seo/Grand-Theft-Auto-V-Rockstar-Games-PlayStation-3-710425471254_0fba9024-bbb2-44a1-9cef-a7ba41b81544_1.44e3b81d879b9dacf5983a97a42ea3b4.jpeg', desc: 'هنا يوجد وصف الصورة 5' },
+                'IMG-006': { img: 'https://upload.wikimedia.org/wikipedia/en/0/0c/FIFA_20_cover_art.jpg', desc: 'هنا يوجد وصف الصورة 6' },
+                'IMG-007': { img: 'https://upload.wikimedia.org/wikipedia/en/5/53/Uncharted_4_box_artwork.jpg', desc: 'هنا يوجد وصف الصورة 7' },
+                'IMG-008': { img: 'https://upload.wikimedia.org/wikipedia/en/8/8b/The_Last_of_Us_Part_II_cover_art.jpg', desc: 'هنا يوجد وصف الصورة 8' },
+                'IMG-009': { img: 'https://upload.wikimedia.org/wikipedia/en/6/68/Bloodborne_Cover_Wallpaper.jpg', desc: 'هنا يوجد وصف الصورة 9' },
+                'IMG-010': { img: 'https://upload.wikimedia.org/wikipedia/en/8/8e/Spider-Man_PS4_cover.jpg', desc: 'هنا يوجد وصف الصورة 10' }
+            };
+
+            popupContent.innerHTML = ''; // تنظيف المحتوى السابق
+
+            if (code === 'IMG-001') {
+                const videoElement = document.createElement('video');
+                videoElement.src = gameDetails[code].video;
+                videoElement.controls = true;
+                videoElement.autoplay = true; // تشغيل الفيديو تلقائيًا
+                videoElement.style.width = '100%';
+                videoElement.style.borderRadius = '8px';
+                popupContent.appendChild(videoElement);
+                currentVideo = videoElement; // تخزين الفيديو الحالي
+            } else {
+                const imgElement = document.createElement('img');
+                imgElement.src = gameDetails[code].img;
+                imgElement.alt = 'Game Image';
+                imgElement.style.width = '100%';
+                imgElement.style.borderRadius = '8px';
+                popupContent.appendChild(imgElement);
+            }
+
+            popupDesc.textContent = gameDetails[code].desc;
+            popup.style.display = 'block';
+        }
+
+        function closeDetails() {
+            playAudio(clickSound);
+            const popup = document.getElementById('details-popup');
+            if (currentVideo) {
+                currentVideo.pause(); // إيقاف الفيديو عند الإغلاق
+                currentVideo.currentTime = 0; // إعادة الفيديو إلى البداية
+                currentVideo = null; // إعادة تعيين المتغير
+            }
+            popup.style.display = 'none';
+        }
+
+        document.getElementById('search-bar').addEventListener('input', filterGames);
+        document.getElementById('category-filter').addEventListener('change', filterGames);
+
+        function filterGames() {
+            playAudio(hoverSound);
+            const searchTerm = document.getElementById('search-bar').value.toLowerCase();
+            const category = document.getElementById('category-filter').value;
+            const items = document.querySelectorAll('#media-container label');
+
+            items.forEach(item => {
+                const code = item.querySelector('input').value.toLowerCase();
+                const itemCategory = item.getAttribute('data-category');
+
+                const matchesSearch = code.includes(searchTerm);
+                const matchesCategory = category === 'all' || itemCategory === category;
+
+                item.style.display = (matchesSearch && matchesCategory) ? 'block' : 'none';
+            });
+        }
+
+        document.getElementById('total-area').addEventListener('input', updateArea);
+
+        document.querySelectorAll('.media-item').forEach(item => {
+            item.addEventListener('mouseover', () => {
+                playAudio(hoverSound);
+            });
+        });
+
+        document.getElementById('confirm-btn').addEventListener('mouseover', () => {
+            playAudio(hoverSound);
+        });
+    </script>
+</body>
+</html>
